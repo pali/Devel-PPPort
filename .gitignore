@@ -1,12 +1,5 @@
-/blib/
-/Makefile
-/Makefile.old
-/MANIFEST.bak
-/META.yml
-/MYMETA.*
-pm_to_blib
 /PPPort.pm
-/RealPPPort.*
-/ppport.h
-/t/*.t
-/*.o
+#ignored in /ext
+#/ppport.h
+/module*.c
+/RealPPPort.xs
