@@ -23,6 +23,22 @@ __UNDEFINED__  UTF8f           SVf
 __UNDEFINED__  UTF8fARG(u,l,p) newSVpvn_flags((p), (l), ((u) ? SVf_UTF8 : 0) | SVs_TEMP)
 #endif
 
+#if { VERSION >= 5.006 }
+  #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
+    __UNDEFINED__ SvPVbyte_nomg(sv, len) ({ char *_buf = SvPV_nomg(sv, len); (!SvUTF8(sv) ? _buf : (SvGMAGICAL(sv) ? SvPVbytex(newSVpvn_flags(_buf, len, SVf_UTF8|SVs_TEMP)) : SvPVbyte(sv, len))); })
+    __UNDEFINED__ SvPVutf8_nomg(sv, len) ({ char *_buf = SvPV_nomg(sv, len); (SvUTF8(sv) ? _buf : (SvGMAGICAL(sv) ? SvPVutf8x(newSVpvn_flags(_buf, len, SVs_TEMP)) : SvPVutf8(sv, len))); })
+  #else
+    __UNDEFINED__ SvPVbyte_nomg(sv, len) ((PL_Xpv = (XPV *)SvPV_nomg(sv, len)), (!SvUTF8(sv) ? (char *)PL_Xpv : (SvGMAGICAL(sv) ? SvPVbytex(newSVpvn_flags((char *)PL_Xpv, len, SVf_UTF8|SVs_TEMP)) : SvPVbyte(sv, len))))
+    __UNDEFINED__ SvPVutf8_nomg(sv, len) ((PL_Xpv = (XPV *)SvPV_nomg(sv, len)), (SvUTF8(sv) ? (char *)PL_Xpv : (SvGMAGICAL(sv) ? SvPVutf8x(newSVpvn_flags((char *)PL_Xpv, len, SVs_TEMP)) : SvPVutf8(sv, len))))
+  #endif
+  __UNDEFINED__ SvPVutf8_or_null_nomg(sv, len) (SvOK(sv) ? SvPVutf8_nomg(sv, len) : ((len = 0), NULL))
+  __UNDEFINED__ SvPVutf8_or_null(sv, len) (SvGETMAGIC(sv), SvPVutf8_or_null_nomg(sv, len))
+#else
+  __UNDEFINED__ SvPVbyte_nomg(sv, len) SvPV_nomg(sv, len)
+#endif
+__UNDEFINED__ SvPVbyte_or_null_nomg(sv, len) (SvOK(sv) ? SvPVbyte_nomg(sv, len) : ((len = 0), NULL))
+__UNDEFINED__ SvPVbyte_or_null(sv, len) (SvGETMAGIC(sv), SvPVbyte_or_null_nomg(sv, len))
+
 #define D_PPP_MIN(a,b) (((a) <= (b)) ? (a) : (b))
 
 __UNDEFINED__ UNICODE_REPLACEMENT  0xFFFD
